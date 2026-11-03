@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Квест-бук: Тайны Гомельщины</title>
+    <style>
+        :root {
+            --bg-color: #f4ebd0;
+            --paper-color: #faf4e6;
+            --red-main: #881337;
+            --red-dark: #4c0519;
+            --green-main: #15803d;
+            --green-dark: #14532d;
+            --amber-border: #d97706;
+            --text-color: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 50px;
+        }
+
+        header {
+            background-color: var(--red-main);
+            color: #fef3c7;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-bottom: 4px solid var(--green-main);
+        }
+
+        .header-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .counter {
+            background-color: var(--red-dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .counter span {
+            color: #fbbf24;
+            font-weight: bold;
+        }
+
+        nav {
+            background-color: var(--red-dark);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 8px 10px;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: #fde68a;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        nav button.active, nav button:hover {
+            background-color: var(--green-main);
+            color: #ffffff;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 24px auto 0;
+            padding: 0 16px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--paper-color);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 4px solid var(--red-main);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-content {
+            text-align: center;
+        }
+
+        .subtitle {
+            color: var(--red-main);
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            color: var(--red-dark);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .polaroid {
+            background: white;
+            padding: 12px;
+            display: inline-block;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            transform: rotate(1deg);
+            margin: 15px 0;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .polaroid-frame {
+            width: 100%;
+            height: 250px;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .polaroid-frame img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .btn-primary {
+            background-color: var(--green-main);
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 14px 28px;
+            border: 2px solid var(--green-dark);
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, background-color 0.2s;
+            margin-top: 15px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--green-dark);
+            transform: translateY(-2px);
+        }
+
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .location-card {
+            background: white;
+            border: 2px solid #fef3c7;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .location-card:hover {
+            border-color: var(--amber-border);
+            transform: translateY(-2px);
+        }
+
+        .location-card.passed {
+            background-color: #f0fdf4;
+            border-color: var(--green-main);
+        }
+
+        .loc-number {
+            width: 32px;
+            height: 32px;
+            background-color: var(--red-main);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .location-card.passed .loc-number {
+            background-color: var(--green-main);
+        }
+
+        .quest-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .page-tag {
+            background-color: #ffe4e6;
+            color: var(--red-main);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .quest-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 768px) {
+            .quest-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .task-box {
+            background-color: #fef3c7;
+            border: 2px solid #fde68a;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .task-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .task-input-group input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid var(--amber-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .task-input-group button {
+            background-color: var(--green-main);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .success-msg {
+            margin-top: 12px;
+            padding: 10px;
+            background-color: #dcfce7;
+            border: 1px solid #86efac;
+            color: #166534;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .error-msg {
+            margin-top: 10px;
+            color: #dc2626;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .letters-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 10px;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .matrix-box {
+            background: white;
+            border: 2px solid #fde68a;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .matrix-box .loc-lbl {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            font-weight: bold;
+            display: block;
+        }
+
+        .matrix-box .char {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--red-dark);
+            height: 32px;
+            line-height: 32px;
+        }
+
+        .final-word-banner {
+            background: #dcfce7;
+            border: 2px solid var(--green-main);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .final-word {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: var(--red-main);
+            background: white;
+            padding: 10px 20px;
+            display: inline-block;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #86efac;
+        }
+
+        .certificate {
+            background: white;
+            border: 8px solid var(--red-main);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .cert-inner {
+            border: 2px solid var(--green-main);
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .cert-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-bottom: 2px solid var(--amber-border);
+            padding: 5px 15px;
+            margin: 15px 0;
+            text-align: center;
+            color: var(--red-dark);
+        }
+
+        @media print {
+            header, nav, .btn-primary { display: none !important; }
+            body { background: white; }
+            main { margin: 0; max-width: 100%; }
+            .card { border: none; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo" onclick="switchTab('cover')">📖 Тайны Гомельщины</div>
+            <div class="counter">Собрано букв: <span id="letters-count">0</span> / 12</div>
+        </div>
+        <nav>
+            <button id="nav-cover" class="active" onclick="switchTab('cover')">Обложка</button>
+            <button id="nav-map" onclick="switchTab('map')">Карта</button>
+            <button id="nav-quest" onclick="switchTab('quest')">Локации (<span id="current-loc-num">1</span>/12)</button>
+            <button id="nav-final" onclick="switchTab('final')">Главная Тайна</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- ВКЛАДКА 1: ОБЛОЖКА -->
+        <section id="tab-cover" class="tab-content active">
+            <div class="card cover-content">
+                <p class="subtitle">Твой личный дневник</p>
+                <h1 class="main-title">Тайны Гомельщины</h1>
+                
+                <div class="polaroid">
+                    <div class="polaroid-frame">
+                        <img src="OIP.jpg" alt="Карта Гомельской области">
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn-primary" onclick="switchTab('map')">КВЕСТ-БУК ИССЛЕДОВАТЕЛЯ</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 2: КАРТА -->
+        <section id="tab-map" class="tab-content">
+            <div class="card">
+                <h2>🗺️ Маршрут экспедиции</h2>
+                <p style="margin-top: 5px; color: #4b5563; font-size: 0.9rem;">
+                    Выбирай любую локацию на карте и разгадывай тайны Гомельской области!
+                </p>
+                <div class="map-grid" id="map-grid"></div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 3: ЛОКАЦИИ КВЕСТА -->
+        <section id="tab-quest" class="tab-content">
+            <div class="card">
+                <div class="quest-header">
+                    <span class="page-tag" id="q-page">Страницы 3-4</span>
+                    <div>
+                        <button onclick="prevLoc()" style="padding: 4px 10px; cursor: pointer;">← Назад</button>
+                        <span id="q-counter" style="font-weight: bold; margin: 0 8px;">1 из 12</span>
+                        <button onclick="nextLoc()" style="padding: 4px 10px; cursor: pointer;">Вперед →</button>
+                    </div>
+                </div>
+
+                <div class="quest-layout">
+                    <div class="polaroid" style="margin: 0;">
+                        <div class="polaroid-frame">
+                            <img id="q-img" src="" alt="Локация">
+                        </div>
+                        <p id="q-address" style="margin-top: 8px; font-weight: bold; color: var(--red-main); font-size: 0.85rem; text-align: center;"></p>
+                    </div>
+
+                    <div>
+                        <h2 id="q-title" style="color: var(--red-dark); font-size: 1.8rem; margin-bottom: 10px;"></h2>
+                        <p id="q-desc" style="font-style: italic; color: #374151; font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px;"></p>
+
+                        <div class="task-box">
+                            <h4 style="color: var(--red-main); margin-bottom: 6px;">💡 Задание:</h4>
+                            <p id="q-task" style="font-size: 0.95rem; font-weight: 500;"></p>
+                            <p style="margin-top: 10px; font-size: 0.85rem; color: #b91c1c; font-weight: bold;">
+                                ➔ Запиши ответ и перенеси <span id="q-letter-idx"></span>-ю букву в финал.
+                            </p>
+
+                            <div class="task-input-group">
+                                <input type="text" id="q-input" placeholder="Введи ответ...">
+                                <button onclick="checkAnswer()">Проверить</button>
+                            </div>
+
+                            <div class="success-msg" id="q-success">
+                                ✓ Верно! Ключевая буква: <span id="q-char" style="background: var(--green-main); color: white; padding: 2px 8px; border-radius: 4px;"></span>
+                            </div>
+                            <div class="error-msg" id="q-error">Неверно. Попробуй еще раз!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 4: ГЛАВНАЯ ТАЙНА -->
+        <section id="tab-final" class="tab-content">
+            <div class="card" style="text-align: center;">
+                <h2 style="color: var(--red-dark); font-size: 2rem;">ГЛАВНАЯ ТАЙНА</h2>
+                <p style="color: #4b5563; font-size: 0.9rem; margin-top: 5px;">Собери все буквы из 12 локаций для расшифровки кода!</p>
+
+                <div class="letters-matrix" id="letters-matrix"></div>
+
+                <div class="final-word-banner" id="final-banner">
+                    <h3 style="color: var(--green-dark);">🎉 ПОЗДРАВЛЯЕМ! КВЕСТ ПРОЙДЕН!</h3>
+                    <p style="font-size: 0.9rem; color: #15803d; margin-top: 5px;">Разгадана главная фраза экспедиции:</p>
+                    <div class="final-word">КРАЙ РОДНОЙ</div>
+                    <br>
+                    <button class="btn-primary" onclick="switchTab('cert')">Получить Сертификат →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 5: СЕРТИФИКАТ -->
+        <section id="tab-cert" class="tab-content">
+            <div class="certificate">
+                <div class="cert-inner">
+                    <h3 style="color: var(--red-main); font-size: 0.9rem; letter-spacing: 2px;">СЕРТИФИКАТ ИССЛЕДОВАТЕЛЯ</h3>
+                    <h1 style="font-size: 2.2rem; color: var(--text-color); margin: 10px 0;">ТАЙНЫ ГОМЕЛЬЩИНЫ</h1>
+                    <p style="font-size: 0.9rem; color: #6b7280;">Настоящим подтверждается, что</p>
+                    
+                    <input type="text" id="user-name" class="cert-name" value="Исследователь" placeholder="Введи свое имя">
+                    
+                    <p style="font-size: 0.95rem; color: #374151; max-width: 500px; margin: 0 auto 20px; line-height: 1.5;">
+                        успешно прошёл(ла) все 12 историко-краеведческих локаций Гомельской области и доказал(а) звание настоящего знатока родногo края!
+                    </p>
+
+                    <button class="btn-primary" onclick="window.print()" style="font-size: 1rem; padding: 10px 20px;">Распечатать сертификат</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const LOCATIONS = [
+            { id: 1, title: "1. Дворец на Соже", city: "г. Гомель", address: "пл. Ленина, 4", page: "3-4", img: "1.jpg", desc: "Стартуем в самом центре! Этот дворец — свидетель великих эпох. Екатерина II подарила эти земли фельдмаршалу Румянцеву.", task: "Фамилия второго знаменитого владельца дворца (полководца).", targetLetterIdx: 3, answer: ["ПАСКЕВИЧ"] },
+            { id: 2, title: "2. Белорусская Венеция", city: "г. Добруш", address: "пр-т Луначарского, 7", page: "5-6", img: "2.jpg", desc: "Город Добруш пронизан каналами и мостами. В конце XIX века здесь построили фабрику из красного кирпича.", task: "В каком архитектурном стиле выстроены старые корпуса этой фабрики?", targetLetterIdx: 8, answer: ["НЕОГОТИКА"] },
+            { id: 3, title: "3. Портал в прошлое", city: "г. Ветка", address: "Красная площадь, 5", page: "7-8", img: "3.jpg", desc: "Город Ветка основан беглыми староверами. Местный музей хранит рукописные фолианты и рушники.", task: "Священное живописное изображение, школу написания которых сохранили в Ветке.", targetLetterIdx: 5, answer: ["ИКОНА"] },
+            { id: 4, title: "4. Тайны масонов", city: "д. Хальч", address: "ул. Завьялова", page: "9-10", img: "4.jpg", desc: "На крутом берегу Сожа стоит дворец Войнич-Сеножецких. В его подвалах тайно собиралась масонская ложа.", task: "Архитектурный стиль конца 18-го века (строгие линии, колонны) здания дворца.", targetLetterIdx: 9, answer: ["КЛАССИЦИЗМ"] },
+            { id: 5, title: "5. Деревянный камень", city: "г. Чечерск", address: "ул. Ленина, 4", page: "11-12", img: "5.jpg", desc: "Ратуша кажется каменной, но это архитектурная иллюзия! Она сделана совсем из другого материала.", task: "Из какого природного материала на самом деле полностью возведено это здание?", targetLetterIdx: 6, answer: ["ДЕРЕВО", "ДРЕВЕСИНА"] },
+            { id: 6, title: "6. Сказочный замок", city: "аг. Красный Берег", address: "ул. Л.В. Исаева, 14", page: "13-14", img: "6.jpg", desc: "Роскошная усадьба Козелл-Поклевских в тени английского парка. Водостоки охраняют химеры.", task: "Главный тяжелый строительный материал красного цвета, из которого выстроены стены.", targetLetterIdx: 6, answer: ["КИРПИЧ"] },
+            { id: 7, title: "7. Средневековье на горе", city: "г. Мозырь", address: "ул. Гора Коммунаров, 8", page: "15-16", img: "7.jpg", desc: "На Замковой горе в Мозыре воссоздана атмосфера сурового средневековья с видом на Припять.", task: "Крупный ствол дерева, из множества которых сложены стены и башни замка.", targetLetterIdx: 5, answer: ["БРЕВНО"] },
+            { id: 8, title: "8. Растущие из земли", city: "г. Туров", address: "Борисо-Глебское кладбище", page: "17-18", img: "8.jpg", desc: "Древний Туров известен каменными святынями, которые буквально «растут» из земли.", task: "Как называются эти тяжелые каменные религиозные символы? (Во множественном числе)", targetLetterIdx: 6, answer: ["КРЕСТЫ"] },
+            { id: 9, title: "9. Эпоха мамонтов", city: "аг. Юровичи", address: "Юровичский сельсовет, 28", page: "19-20", img: "9.jpg", desc: "Самая древняя стоянка первобытных людей в Беларуси (26 тыс. лет). Здесь охотились на мамонтов.", task: "Как называется культурное учреждение, созданное на месте раскопок?", targetLetterIdx: 5, answer: ["МУЗЕЙ"] },
+            { id: 10, title: "10. Кипящая вода", city: "г.п. Лоев", address: "ул. Советская, 3", page: "21-22", img: "10.jpg", desc: "В 1943 году здесь прошла страшная переправа через Днепр. Вода кипела от взрывов.", task: "Воинское звание или просто название рядового бойца (проявившего героизм).", targetLetterIdx: 1, answer: ["ВОИН", "СОЛДАТ"] },
+            { id: 11, title: "11. Святое возвращение", city: "г. Речица", address: "ул. Набережная", page: "23-24", img: "11.jpg", desc: "В 1910 г. здесь останавливалась флотилия с мощями святой просветительницы.", task: "Имя знаменитой белорусской святой (впишите только имя).", targetLetterIdx: 4, answer: ["ЕФРОСИНИЯ", "ЕФРОСИНЬЯ"] },
+            { id: 12, title: "12. Истоки маршрута", city: "г. Гомель", address: "Киевский спуск", page: "25-26", img: "12.jpg", desc: "Финиш! Памятник первому гомельчанину-лодочнику. Он приплыл сюда по полноводной реке.", task: "Как называется крупная полноводная река, на набережной которой стоит памятник?", targetLetterIdx: 3, answer: ["СОЖ"] }
+        ];
+
+        let currentLocIdx = 0;
+        let progress = JSON.parse(localStorage.getItem('gomel_quest_data')) || {};
+
+        function saveProgress() {
+            localStorage.setItem('gomel_quest_data', JSON.stringify(progress));
+            updateStats();
+        }
+
+        function updateStats() {
+            const count = Object.keys(progress).length;
+            document.getElementById('letters-count').innerText = count;
+            if (count === 12) {
+                document.getElementById('final-banner').style.display = 'block';
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabName).classList.add('active');
+            const navBtn = document.getElementById('nav-' + tabName);
+            if(navBtn) navBtn.classList.add('active');
+
+            if (tabName === 'map') renderMap();
+            if (tabName === 'quest') renderQuest();
+            if (tabName === 'final') renderFinal();
+        }
+
+        function renderMap() {
+            const grid = document.getElementById('map-grid');
+            grid.innerHTML = LOCATIONS.map((loc, i) => {
+                const isDone = !!progress[loc.id];
+                return `
+                    <div class="location-card ${isDone ? 'passed' : ''}" onclick="selectLoc(${i})">
+                        <div style="display:flex; align-items:center;">
+                            <div class="loc-number">${loc.id}</div>
+                            <div>
+                                <strong style="font-size:0.9rem;">${loc.title}</strong><br>
+                                <small style="color:#6b7280;">${loc.city}</small>
+                            </div>
+                        </div>
+                        <div>${isDone ? '✓' : '→'}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectLoc(idx) {
+            currentLocIdx = idx;
+            switchTab('quest');
+        }
+
+        function renderQuest() {
+            const loc = LOCATIONS[currentLocIdx];
+            document.getElementById('current-loc-num').innerText = currentLocIdx + 1;
+            document.getElementById('q-counter').innerText = `${currentLocIdx + 1} из 12`;
+            document.getElementById('q-page').innerText = `Страницы ${loc.page}`;
+            document.getElementById('q-title').innerText = loc.title;
+            document.getElementById('q-address').innerText = `📍 ${loc.city}, ${loc.address}`;
+            document.getElementById('q-desc').innerText = `"${loc.desc}"`;
+            document.getElementById('q-task').innerText = loc.task;
+            document.getElementById('q-letter-idx').innerText = loc.targetLetterIdx;
+            document.getElementById('q-img').src = loc.img;
+
+            const input = document.getElementById('q-input');
+            const success = document.getElementById('q-success');
+            const error = document.getElementById('q-error');
+
+            error.style.display = 'none';
+
+            if (progress[loc.id]) {
+                input.value = progress[loc.id].userVal;
+                success.style.display = 'block';
+                document.getElementById('q-char').innerText = progress[loc.id].char;
+            } else {
+                input.value = '';
+                success.style.display = 'none';
+            }
+        }
+
+        function prevLoc() {
+            if (currentLocIdx > 0) {
+                currentLocIdx--;
+                renderQuest();
+            }
+        }
+
+        function nextLoc() {
+            if (currentLocIdx < LOCATIONS.length - 1) {
+                currentLocIdx++;
+                renderQuest();
+            }
+        }
+
+        function checkAnswer() {
+            const loc = LOCATIONS[currentLocIdx];
+            const val = document.getElementById('q-input').value.trim().toUpperCase();
+            
+            if (loc.answer.includes(val)) {
+                const char = val[loc.targetLetterIdx - 1] || '?';
+                progress[loc.id] = { userVal: val, char: char };
+                saveProgress();
+                renderQuest();
+            } else {
+                document.getElementById('q-error').style.display = 'block';
+            }
+        }
+
+        function renderFinal() {
+            const container = document.getElementById('letters-matrix');
+            container.innerHTML = LOCATIONS.map(loc => {
+                const char = progress[loc.id] ? progress[loc.id].char : '?';
+                return `
+                    <div class="matrix-box">
+                        <span class="loc-lbl">Лок. ${loc.id}</span>
+                        <div class="char">${char}</div>
+                    </div>
+                `;
+            }).join('');
+            updateStats();
+        }
+
+        updateStats();
+    </script>
+</body>
+</html>
